@@ -10,10 +10,14 @@
 
 #include "libraries/list.h"
 
-#define __ENV 0
-
 struct ftsh {
     char **envp;
     struct list *refs[1];
     unsigned char status;
 };
+
+void
+display_prompt(struct ftsh *);
+
+char *
+read_stdin(struct ftsh *);

@@ -29,8 +29,9 @@ main(__attribute__((unused)) int argc, const char **argv, const char **envp)
 {
     do {
         if (isatty(STDIN_FILENO) == 1) {
-            write(STDIN_FILENO, " ? ", 3);
+            display_prompt(&shell);
         }
+        read_stdin(&shell);
     } while (1);
     __builtin_unreachable();
 }
