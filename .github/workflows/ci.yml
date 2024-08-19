@@ -1,0 +1,67 @@
+name: CI
+run-name: "`${{ github.actor }}` triggered `CI` workflow from a ${{ github.event_name }} on `${{ github.head_ref || github.ref_name }}` : ${{ github.event.head_commit.message || github.event.workflow_run.head_commit.message }}"
+
+on:
+  push:
+    branches:
+    - 'main'
+  pull_request:
+
+env:
+  binary-name: ftsh
+
+jobs:
+  ###
+  # Run coding style checker
+  #
+  check-coding-style:
+    name: Checking coding style
+    runs-on: ubuntu-latest
+    container: ghcr.io/epitech/coding-style-checker:latest
+
+    steps:
+    - name: Cloning repository
+      uses: actions/checkout@v4
+      timeout-minutes: 2
+
+    - name: Running bannana-checker
+      uses: lszsrd/ci-composite-actions/coding-style-checker@v1
+      timeout-minutes: 2
+
+  ###
+  # Check projects compilation
+  #
+  check-program-compilation:
+    name: Checking compilation
+    runs-on: ubuntu-latest
+    container: ghcr.io/epitech/coding-style-checker:latest
+    needs: check-coding-style
+
+    steps:
+    - name: Cloning repository
+      uses: actions/checkout@v4
+      timeout-minutes: 2
+
+    - name: Checking compilation for `${{ env.binary-name }}` binary
+      uses: lszsrd/ci-composite-actions/makefile-build-checker@v1
+      with:
+        binary-name: ${{ env.binary-name }}
+      timeout-minutes: 2
+
+  ###
+  # Run unit tests
+  #
+  run-tests:
+    name: Running unit tests
+    runs-on: ubuntu-latest
+    container: epitechcontent/epitest-docker
+    needs: check-program-compilation
+
+    steps:
+    - name: Cloning repository
+      uses: actions/checkout@v4
+      timeout-minutes: 2
+
+    - name: Running unit tests
+      run: make tests_run
+      timeout-minutes: 2

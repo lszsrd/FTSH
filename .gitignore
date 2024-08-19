@@ -1,0 +1,10 @@
+.DS_Store
+compile_flags.txt
+*.o
+*.a
+*.so
+*.gcda
+*.gcno
+*.out
+unit_tests*
+/ftsh
