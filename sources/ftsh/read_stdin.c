@@ -15,12 +15,12 @@
 char *
 read_stdin(struct ftsh *shell)
 {
-    char *buffer = NULL;
-    size_t buffer_size = 0;
+    char *stream = NULL;
+    size_t stream_size = 0;
 
-    if (getline(&buffer, &buffer_size, stdin) == EOF) {
-        free(buffer);
+    if (getline(&stream, &stream_size, stdin) == EOF) {
+        free(stream);
         exit(shell->status);
     }
-    return (buffer);
+    return (stream);
 }

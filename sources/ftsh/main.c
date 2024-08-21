@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 #include "ftsh/ftsh.h"
+#include "ftsh/parser.h"
 
 struct ftsh shell = {0};
 
@@ -25,13 +26,13 @@ destructor(void)
 }
 
 __attribute__((noreturn)) int
-main(__attribute__((unused)) int argc, const char **argv, const char **envp)
+main(__attribute__((unused)) int argc, const char **argv)
 {
     do {
         if (isatty(STDIN_FILENO) == 1) {
             display_prompt(&shell);
         }
-        read_stdin(&shell);
+        shell.ast = parse_stream(read_stdin(&shell));
     } while (1);
     __builtin_unreachable();
 }

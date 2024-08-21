@@ -8,16 +8,16 @@
 
 #pragma once
 
-#include "libraries/list.h"
+struct list;
+struct ast;
 
 struct ftsh {
-    char **envp;
-    struct list *refs[1];
+    struct ast *ast;
     unsigned char status;
 };
 
-void
+__attribute__((nonnull(1))) void
 display_prompt(struct ftsh *);
 
-char *
+__attribute__((nonnull(1))) char *
 read_stdin(struct ftsh *);

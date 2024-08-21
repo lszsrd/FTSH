@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <pwd.h>
+#include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -17,12 +18,19 @@ void
 display_prompt(struct ftsh *shell)
 {
     char *user = getpwuid(getuid())->pw_name;
+    char *home = getenv("HOME");
     char *path = NULL;
+    void *path_pointer = path;
 
-    path = getcwd(path, 0);
     if (shell->status != 0) {
-        printf("(\033[31m%d\033[0m) ", shell->status);
+        printf("\033[31m%d ", shell->status);
     }
-    printf("\033[34m%s \033[0m- \033[36m%s \033[0m? ", user, path);
-    free(path);
+    path = getcwd(path, 0);
+    if (path != NULL && home != NULL) {
+        if (strncmp(path, home, strlen(home)) == 0) {
+            path = strncpy(&path[strlen(home) - 1], "~/", 2);
+        }
+    }
+    printf("\033[34m%s \033[36m%s \033[0m? ", user, path);
+    free(path_pointer);
 }
