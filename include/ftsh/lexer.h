@@ -28,11 +28,11 @@ enum token {
     CHARACTER, WORD, REDIRECTION, SEPARATOR, PARENTHESIS, SEMICOLON, NEWLINE
 };
 
-enum token
+__attribute__((nonnull(1))) enum token
 peek_token(const char *stream);
 
-short
+__attribute__((nonnull(1, 2))) short
 digest_token(const char *stream, const char **charset);
 
-void
+__attribute__((nonnull(1))) void
 pop_token(char **stream);

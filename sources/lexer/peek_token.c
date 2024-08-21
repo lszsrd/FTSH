@@ -19,7 +19,7 @@ const char **charsets[] =
 enum token
 peek_token(const char *stream)
 {
-    if (stream == (void *) 0 || *stream == '\0' || *stream == '\n') {
+    if (*stream == '\0' || *stream == '\n') {
         return (NEWLINE);
     }
     if (*stream == ';') {

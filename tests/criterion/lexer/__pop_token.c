@@ -13,23 +13,31 @@
 
 Test(pop_token, pop_null)
 {
-    char *stream = NULL;
+    char *stream = (char *) "";
 
     pop_token(&stream);
-    cr_assert_eq(stream, NULL);
+    cr_assert_eq(*stream, '\0');
 }
 
 Test(pop_token, pop_newline)
 {
-    char *stream = strdup("\n");
+    char *stream = (char *) "\n";
 
     pop_token(&stream);
     cr_assert_eq(*stream, '\n');
 }
 
+Test(pop_token, pop_semicolon)
+{
+    char *stream = (char *) "; cd -";
+
+    pop_token(&stream);
+    cr_assert_eq(*stream, ' ');
+}
+
 Test(pop_token, pop_character)
 {
-    char *stream = strdup("Hello World");
+    char *stream = (char *) "Hello World";
 
     pop_token(&stream);
     cr_assert_eq(*stream, 'e');
@@ -37,7 +45,7 @@ Test(pop_token, pop_character)
 
 Test(pop_token, pop_append_redirection)
 {
-    char *stream = strdup(">> week_logs");
+    char *stream = (char *) ">> week_logs";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');
@@ -45,7 +53,7 @@ Test(pop_token, pop_append_redirection)
 
 Test(pop_token, digest_is_redirection_output)
 {
-    char *stream = strdup("> logs");
+    char *stream = (char *) "> logs";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');
@@ -53,7 +61,7 @@ Test(pop_token, digest_is_redirection_output)
 
 Test(pop_token, digest_is_redirection_errors)
 {
-    char *stream = strdup("2> errors_logs");
+    char *stream = (char *) "2> errors_logs";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');
@@ -61,7 +69,7 @@ Test(pop_token, digest_is_redirection_errors)
 
 Test(pop_token, digest_is_redirection_outputs)
 {
-    char *stream = strdup("2>&1 all_logs");
+    char *stream = (char *) "2>&1 all_logs";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');
@@ -69,7 +77,7 @@ Test(pop_token, digest_is_redirection_outputs)
 
 Test(pop_token, digest_is_redirection_input)
 {
-    char *stream = strdup("< database");
+    char *stream = (char *) "< database";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');
@@ -77,7 +85,7 @@ Test(pop_token, digest_is_redirection_input)
 
 Test(pop_token, digest_is_redirection_here_document)
 {
-    char *stream = strdup("<< EOF");
+    char *stream = (char *) "<< EOF";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');
@@ -85,7 +93,7 @@ Test(pop_token, digest_is_redirection_here_document)
 
 Test(pop_token, digest_is_separator_and)
 {
-    char *stream = strdup("&& cd -");
+    char *stream = (char *) "&& cd -";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');
@@ -93,7 +101,7 @@ Test(pop_token, digest_is_separator_and)
 
 Test(pop_token, digest_is_separator_or)
 {
-    char *stream = strdup("|| exit");
+    char *stream = (char *) "|| exit";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');
@@ -101,7 +109,7 @@ Test(pop_token, digest_is_separator_or)
 
 Test(pop_token, digest_is_separator_pipe)
 {
-    char *stream = strdup("| grep 'HOME'");
+    char *stream = (char *) "| grep 'HOME'";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');
@@ -109,7 +117,7 @@ Test(pop_token, digest_is_separator_pipe)
 
 Test(pop_token, digest_is_parenthesis_left)
 {
-    char *stream = strdup("(cd -)");
+    char *stream = (char *) "(cd -)";
 
     pop_token(&stream);
     cr_assert_eq(*stream, 'c');
@@ -117,7 +125,7 @@ Test(pop_token, digest_is_parenthesis_left)
 
 Test(pop_token, digest_is_parenthesis_right)
 {
-    char *stream = strdup(") ; ls logs");
+    char *stream = (char *) ") ; ls logs";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');
