@@ -12,8 +12,7 @@ CFLAGS					+=	-Wall -Wextra -Wpedantic -Wundef -Wpointer-arith \
 					 		-Waggregate-return -Wwrite-strings -Winit-self 	 \
 							-Wlogical-not-parentheses -Waddress	-Wshadow	 \
 							-fpic -iquote include -g
-LDFLAGS					+=	-Wl,-rpath libraries -L libraries 		 		 \
-							-l list -l strtoarray
+LDFLAGS					+=	-Wl,-rpath libraries -L libraries -l list
 CPPGLAGS				+=
 
 # `ftsh` binary part
@@ -26,11 +25,6 @@ LIB_LIST				:=	liblist.so
 LIB_LIST_SOURCES		:=	$(shell find libraries/list -name '*.c')
 LIB_LIST_OBJECTS		:=	$(LIB_LIST_SOURCES:.c=.o)
 
-# `strtoarray` library part
-LIB_STRTOARRAY			:=	libstrtoarray.so
-LIB_STRTOARRAY_SOURCES	:=	$(shell find libraries/strtoarray -name '*.c')
-LIB_STRTOARRAY_OBJECTS	:=	$(LIB_STRTOARRAY_SOURCES:.c=.o)
-
 # `unit_tests` tests part
 TESTS_BINARY			:=	unit_tests
 TESTS_SOURCES			:=	$(filter-out sources/ftsh/main.c,				 \
@@ -39,17 +33,12 @@ TESTS_SOURCES			:=	$(filter-out sources/ftsh/main.c,				 \
 TESTS_FLAGS				:=  --coverage -L /opt/homebrew/lib -l criterion
 
 # Builds libraries and binaries
-all: libraries/$(LIB_LIST) libraries/$(LIB_STRTOARRAY) $(BINARY_FTSH)
+all: libraries/$(LIB_LIST) $(BINARY_FTSH)
 
 # Builds `list` shared library
 libraries/$(LIB_LIST): $(LIB_LIST_OBJECTS)
 	$(CC) -shared -o libraries/$(LIB_LIST) $(LIB_LIST_OBJECTS)
 	@printf "\e[1;42mSuccessfully built libraries/%s\e[0m\n" $(LIB_LIST)
-
-# Builds `strtoarray` shared library
-libraries/$(LIB_STRTOARRAY): $(LIB_STRTOARRAY_OBJECTS)
-	$(CC) -shared -o libraries/$(LIB_STRTOARRAY) $(LIB_STRTOARRAY_OBJECTS)
-	@printf "\e[1;42mSuccessfully built libraries/%s\e[0m\n" $(LIB_STRTOARRAY)
 
 # Builds `BINARY_NAME` binary
 $(BINARY_FTSH): $(BINARY_FTSH_OBJECTS)
@@ -60,7 +49,7 @@ $(BINARY_FTSH): $(BINARY_FTSH_OBJECTS)
 tests_run: libraries/$(LIB_LIST) libraries/$(LIB_STRTOARRAY)
 	$(CC) $(CFLAGS) -o unit_tests $(TESTS_SOURCES) $(LDFLAGS) $(TESTS_FLAGS)
 	@printf "\e[1;42mSuccessfully built binary unit_tests\e[0m\n"
-	timeout 1m ./unit_tests
+	timeout 2m ./unit_tests
 	gcovr -e tests -e sources/debug -e sources/ftsh/clear_ast
 
 # Generate a compilation database for clang tooling
@@ -75,7 +64,6 @@ clean:
 # Delete builds' files, binaries and libraries
 fclean: clean
 	$(RM) libraries/$(LIB_LIST) $(LIB_LIST_OBJECTS)
-	$(RM) libraries/$(LIB_STRTOARRAY) $(LIB_STRTOARRAY_OBJECTS)
 	$(RM) $(BINARY_FTSH) $(BINARY_FTSH_OBJECTS)
 	$(RM) unit_tests
 

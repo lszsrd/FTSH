@@ -8,12 +8,11 @@
 
 #pragma once
 
-#include "libraries/list.h"
 #include "ftsh/lexer.h"
 
-struct __IO_digest {
+struct __redirection_data {
     char *file;
-    enum IO digest;
+    enum redirection digest;
 };
 
 struct ast {
@@ -39,4 +38,4 @@ struct ast {
 };
 
 struct ast *
-parse_stream(char *);
+parse_stream(char *stream);

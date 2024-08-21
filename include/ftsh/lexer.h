@@ -8,18 +8,31 @@
 
 #pragma once
 
-#define REDIRECTION_CHARSETS ">>", ">", "2>", "2>&", "<", "<<"
-#define IO_CHARSETS "&&", "||", "|"
+#define REDIRECTION_CHARSETS ">>", ">", "2>&1", "2>", "<<", "<"
+#define SEPARATOR_CHARSETS "&&", "||", "|"
 #define PARENTHESIS_CHARSETS "(", ")"
 
-enum token {
-    CHARACTER, WORD, IO, SEPARATOR, PARENTHESIS, SEMICOLON, EOS
-};
-
-enum IO {
-    APPEND, OUTPUT, ERRORS, OUTPUTS, INPUT, HERE_DOCUMENT
+enum redirection {
+    APPEND, OUTPUT, OUTPUTS, ERRORS, HERE_DOCUMENT, INPUT
 };
 
 enum separator {
     AND, OR, PIPE
 };
+
+enum parenthesis {
+    OPEN, CLOSE
+};
+
+enum token {
+    CHARACTER, WORD, REDIRECTION, SEPARATOR, PARENTHESIS, SEMICOLON, NEWLINE
+};
+
+enum token
+peek_token(const char *stream);
+
+short
+digest_token(const char *stream, const char **charset);
+
+void
+pop_token(char **stream);

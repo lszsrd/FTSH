@@ -8,7 +8,6 @@
 
 #pragma once
 
-struct list;
 struct ast;
 
 struct ftsh {
@@ -17,7 +16,7 @@ struct ftsh {
 };
 
 __attribute__((nonnull(1))) void
-display_prompt(struct ftsh *);
+display_prompt(struct ftsh *shell);
 
 __attribute__((nonnull(1))) char *
-read_stdin(struct ftsh *);
+read_stdin(struct ftsh *shell);

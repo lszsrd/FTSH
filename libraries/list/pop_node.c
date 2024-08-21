@@ -11,7 +11,7 @@
 #include "libraries/list.h"
 
 unsigned char
-pop_node(struct list **ref, struct list *node, void (*cleanup) (void *ptr))
+pop_node(struct list **ref, struct list *node, void (*cleanup) (void *))
 {
     struct list *prev = NULL;
 

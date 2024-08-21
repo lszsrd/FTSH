@@ -19,7 +19,7 @@ add_node(struct list **ref, void *data)
     if (node == NULL) {
         return (0);
     }
-    node->data = (void *) data;
+    node->data = data;
     node->next = *ref;
     *ref = node;
     return (1);

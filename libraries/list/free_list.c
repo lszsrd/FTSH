@@ -11,18 +11,18 @@
 #include "libraries/list.h"
 
 void
-free_list(struct list **ref, void (*function) (void *ptr))
+free_list(struct list **ref, void (*cleanup) (void *))
 {
     struct list *node = *ref;
     struct list *temp = NULL;
 
-    if (function == NULL) {
+    if (cleanup == NULL) {
         return;
     }
     while (node != NULL) {
         temp = node;
         node = node->next;
-        function(temp->data);
+        cleanup(temp->data);
         free(temp->data);
         free(temp);
     }
