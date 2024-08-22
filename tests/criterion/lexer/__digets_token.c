@@ -61,6 +61,11 @@ Test(peek_token, digest_is_separator_pipe)
     cr_assert_eq(digest_token("| grep 'HOME'", charsets[1]), PIPE);
 }
 
+Test(peek_token, digest_is_semicolon)
+{
+    cr_assert_eq(digest_token(";cd -)", charsets[2]), SEMICOLON);
+}
+
 Test(peek_token, digest_is_parenthesis_left)
 {
     cr_assert_eq(digest_token("(cd -)", charsets[2]), OPEN);

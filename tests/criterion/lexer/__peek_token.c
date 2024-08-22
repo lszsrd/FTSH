@@ -26,12 +26,12 @@ Test(peek_token, token_is_a_separator)
 
 Test(peek_token, token_is_a_PARENTHESIS)
 {
-    cr_assert_eq(peek_token(") cd -"), PARENTHESIS);
+    cr_assert_eq(peek_token(") cd -"), DELIMITER);
 }
 
 Test(peek_token, token_is_a_semicolon)
 {
-    cr_assert_eq(peek_token("; exit"), SEMICOLON);
+    cr_assert_eq(peek_token("; exit"), DELIMITER);
 }
 
 Test(peek_token, token_is_a_newline)

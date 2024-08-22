@@ -20,7 +20,7 @@ pop_token(char **stream)
     if (token == NEWLINE) {
         return;
     }
-    if (token == CHARACTER || token == SEMICOLON) {
+    if (token == CHARACTER || token == SEPARATOR) {
         *stream += sizeof(char);
         return;
     }

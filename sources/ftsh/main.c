@@ -19,12 +19,7 @@ constructor(void)
     return;
 }
 
-__attribute__((destructor)) static void
-destructor(void)
-{
-    return;
-}
-
+// ls && cd || a ; a
 __attribute__((noreturn)) int
 main(__attribute__((unused)) int argc, const char **argv)
 {
@@ -35,4 +30,10 @@ main(__attribute__((unused)) int argc, const char **argv)
         shell.ast = parse_stream(read_stdin(&shell));
     } while (1);
     __builtin_unreachable();
+}
+
+__attribute__((destructor)) static void
+destructor(void)
+{
+    return;
 }

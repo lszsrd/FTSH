@@ -20,6 +20,8 @@ Test(read_stdin, standard_input_is_closed)
     cr_assert_eq(read_stdin(&shell), NULL);
 }
 
+// Writing data to stdin with fprintf or write and flushing stdin doesn't work here
+// I re-opened standard input to this file forcing getline to read data from a valid stream
 Test(read_stdin, data_is_sent_to_standard_input)
 {
     struct ftsh shell = {0};

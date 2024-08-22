@@ -12,7 +12,7 @@ const char **charsets[] =
 {
     (const char *[]) { REDIRECTION_CHARSETS, (void *) 0 },
     (const char *[]) { SEPARATOR_CHARSETS, (void *) 0 },
-    (const char *[]) { PARENTHESIS_CHARSETS, (void *) 0 },
+    (const char *[]) { DELIMITER_CHARSETS, (void *) 0 },
     (void *) 0
 };
 
@@ -21,9 +21,6 @@ peek_token(const char *stream)
 {
     if (*stream == '\0' || *stream == '\n') {
         return (NEWLINE);
-    }
-    if (*stream == ';') {
-        return (SEMICOLON);
     }
     for (enum token token = 0; charsets[token] != (void *) 0; token++) {
         if (digest_token(stream, charsets[token]) != -1) {

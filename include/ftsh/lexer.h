@@ -10,7 +10,7 @@
 
 #define REDIRECTION_CHARSETS ">>", ">", "2>&1", "2>", "<<", "<"
 #define SEPARATOR_CHARSETS "&&", "||", "|"
-#define PARENTHESIS_CHARSETS "(", ")"
+#define DELIMITER_CHARSETS ";", "(", ")"
 
 enum redirection {
     APPEND, OUTPUT, OUTPUTS, ERRORS, HERE_DOCUMENT, INPUT
@@ -20,12 +20,12 @@ enum separator {
     AND, OR, PIPE
 };
 
-enum parenthesis {
-    OPEN, CLOSE
+enum delimiter {
+    SEMICOLON, OPEN, CLOSE
 };
 
 enum token {
-    CHARACTER, WORD, REDIRECTION, SEPARATOR, PARENTHESIS, SEMICOLON, NEWLINE
+    CHARACTER, COMMAND, REDIRECTION, SEPARATOR, DELIMITER, NEWLINE
 };
 
 __attribute__((nonnull(1))) enum token

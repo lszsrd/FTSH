@@ -18,7 +18,7 @@ struct __redirection_data {
 struct ast {
     union {
         struct {
-            struct list *IO;
+            struct list *redirections;
             char **argv;
             char *binary;
         }
@@ -31,6 +31,7 @@ struct ast {
         struct {
             struct ast *left;
             struct ast *right;
+            enum delimiter digest;
         }
         __ast;
     };
@@ -39,3 +40,12 @@ struct ast {
 
 struct ast *
 parse_stream(char *stream);
+
+__attribute__((nonnull(1))) struct ast *
+parse_delimiter(char **stream);
+
+__attribute__((nonnull(1))) struct ast *
+parse_separator(char **stream);
+
+__attribute__((nonnull(1))) struct ast *
+parse_command(char **stream);
