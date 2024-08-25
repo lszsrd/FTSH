@@ -2,22 +2,19 @@
 ** EPITECH PROJECT, 2024
 ** sources/parser/parse_command.c
 ** File description:
-** Parse standard input to a command abstract syntax tree node
+** Parse stream to a command AST node
 ** Author: @lszsrd
 */
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "ftsh/parser.h"
-#include "libraries/list.h"
+#include "parser.h"
 
-extern const char **charsets[];
-
-static size_t
-parse_character(char **stream)
+static unsigned short
+parse_characters(char **stream)
 {
-    size_t word_length = 0;
+    unsigned short word_length = 0;
 
     for (; peek_token(*stream) == CHARACTER; pop_token(stream)) {
         if (word_length == 0 && (**stream == ' ' || **stream == '\t')) {
@@ -29,42 +26,46 @@ parse_character(char **stream)
 }
 
 static void
-parse_redirection(char **stream, struct list **ref)
+parse_redirection(char **stream, struct list **head, int redirection)
 {
-    struct __redirection_data *__redirection = NULL;
-    size_t word_length = 0;
+    unsigned short filename_length;
+    struct IO *node;
 
     if (peek_token(*stream) != REDIRECTION) {
         return;
     }
-    __redirection = calloc(1, sizeof(struct __redirection_data));
-    if (__redirection == NULL) {
+    pop_token(stream);
+    filename_length = parse_characters(stream);
+    if (filename_length == 0) {
         return;
     }
-    __redirection->digest = digest_token(*stream, charsets[0]);
-    pop_token(stream);
-    word_length = parse_character(stream);
-    if (word_length != 0) {
-        __redirection->file = strndup(*stream - word_length, word_length);
+    node = calloc(1, sizeof(*node));
+    if (node == NULL) {
+        return;
     }
-    push_node(ref, __redirection);
-    parse_redirection(stream, ref);
+    node->filename_path = strndup(*stream - filename_length, filename_length);
+    node->redirection = redirection;
+    push_list(head, node);
+    parse_redirection(stream, head, peek_type(*stream, charsets[REDIRECTION]));
 }
 
-struct ast *
+struct AST *
 parse_command(char **stream)
 {
-    size_t command_length = parse_character(stream);
-    struct ast *node = NULL;
+    unsigned short length = parse_characters(stream);
+    struct AST *command;
 
-    if (command_length != 0) {
-        node = calloc(1, sizeof(struct ast));
-    }
-    if (node == NULL) {
+    if (length == 0) {
         return (NULL);
     }
-    node->token = COMMAND;
-    node->__command.binary = strndup(*stream - command_length, command_length);
-    parse_redirection(stream, &node->__command.redirections);
-    return (node);
+    command = calloc(1, sizeof(*command));
+    if (command == NULL) {
+        return (NULL);
+    }
+    command->binary_path = strndup(*stream - length, length);
+    command->token = COMMAND;
+    parse_redirection(stream, &command->redirections, peek_type(
+        *stream, charsets[REDIRECTION])
+    );
+    return (command);
 }

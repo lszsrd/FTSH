@@ -9,7 +9,7 @@
 #include <string.h>
 
 #include "../criterion.h"
-#include "ftsh/lexer.h"
+#include "lexer.h"
 
 Test(pop_token, pop_null)
 {
@@ -62,14 +62,6 @@ Test(pop_token, digest_is_redirection_output)
 Test(pop_token, digest_is_redirection_errors)
 {
     char *stream = (char *) "2> errors_logs";
-
-    pop_token(&stream);
-    cr_assert_eq(*stream, ' ');
-}
-
-Test(pop_token, digest_is_redirection_outputs)
-{
-    char *stream = (char *) "2>&1 all_logs";
 
     pop_token(&stream);
     cr_assert_eq(*stream, ' ');

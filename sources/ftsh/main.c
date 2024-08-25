@@ -8,10 +8,8 @@
 
 #include <unistd.h>
 
-#include "ftsh/ftsh.h"
-#include "ftsh/parser.h"
-
-struct ftsh shell = {0};
+#include "ftsh.h"
+#include "parser.h"
 
 __attribute__((constructor)) static void
 constructor(void)
@@ -19,16 +17,18 @@ constructor(void)
     return;
 }
 
-// ls && cd || a ; a
-__attribute__((noreturn)) int
-main(__attribute__((unused)) int argc, const char **argv)
+__attribute__((noreturn))
+int main(__attribute__((unused)) int argc, const char **argv)
 {
-    do {
+    struct ftsh shell = {0};
+
+    while (1) {
         if (isatty(STDIN_FILENO) == 1) {
             display_prompt(&shell);
         }
         shell.ast = parse_stream(read_stdin(&shell));
-    } while (1);
+        clear_ast(shell.ast);
+    }
     __builtin_unreachable();
 }
 

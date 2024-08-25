@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "ftsh/ftsh.h"
+#include "ftsh.h"
 
 void
 display_prompt(struct ftsh *shell)

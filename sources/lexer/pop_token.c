@@ -2,28 +2,24 @@
 ** EPITECH PROJECT, 2024
 ** sources/lexer/pop_token.c
 ** File description:
-** Pop current token from parser's stream
+** Pop current token from stream
 ** Author: @lszsrd
 */
 
 #include <string.h>
 
-#include "ftsh/lexer.h"
+#include "lexer.h"
 
-extern const char **charsets[];
-
-void
-pop_token(char **stream)
+void pop_token(char **stream)
 {
     enum token token = peek_token(*stream);
 
-    if (token == NEWLINE) {
+    if (**stream == '\0' || **stream == '\n') {
         return;
     }
-    if (token == CHARACTER || token == SEPARATOR) {
-        *stream += sizeof(char);
+    if (token == CHARACTER || token == DELIMITER) {
+        *stream += sizeof(**stream);
         return;
     }
-    *stream += strlen(charsets[token - REDIRECTION]
-        [digest_token(*stream, charsets[token - REDIRECTION])]);
+    *stream += strlen(charsets[token][peek_type(*stream, charsets[token])]);
 }

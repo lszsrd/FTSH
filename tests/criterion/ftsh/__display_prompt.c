@@ -11,7 +11,7 @@
 #include <errno.h>
 
 #include "../criterion.h"
-#include "ftsh/ftsh.h"
+#include "ftsh.h"
 
 static void
 redirect_stdout(void)

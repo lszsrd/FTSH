@@ -2,30 +2,26 @@
 ** EPITECH PROJECT, 2024
 ** sources/parser/parse_stream.c
 ** File description:
-** Parse standard input to an abstract syntax tree
+** Parse standard input data to an abstract syntax tree
 ** Author: @lszsrd
 */
 
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
-#include "ftsh/parser.h"
+#include "parser.h"
 
-struct ast *
+struct AST *
 parse_stream(char *stream)
 {
-    struct ast *ast = NULL;
     void *stream_pointer = stream;
-    unsigned char not_empty_stream = 0;
+    struct AST *ast;
 
-    for (size_t i = 0; stream != NULL && stream[i] != '\0'; i++) {
-        if (stream[i] != ' ' && stream[i] != '\t') {
-            not_empty_stream = 1;
-            break;
-        }
+    if (stream == NULL) {
+        return (NULL);
     }
-    if (not_empty_stream == 1) {
-        ast = parse_delimiter(&stream);
-    }
+    ast = parse_delimiter(&stream);
     free(stream_pointer);
     return (ast);
 }

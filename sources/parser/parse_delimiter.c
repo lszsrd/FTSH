@@ -2,34 +2,34 @@
 ** EPITECH PROJECT, 2024
 ** sources/parser/parse_delimiter.c
 ** File description:
-** Parse standard input to a delimiter abstract syntax tree node
+** Parse stream to a delimiter AST node
 ** Author: @lszsrd
 */
 
 #include <stdlib.h>
 
-#include "ftsh/parser.h"
+#include "parser.h"
 
 extern const char **charsets[];
 
-struct ast *
+// TODO: Handle proper parenthesis handler
+struct AST *
 parse_delimiter(char **stream)
 {
-    struct ast *node = NULL;
-    struct ast *__left = parse_separator(stream);
-    enum token token = peek_token(*stream);
+    struct AST *delimiter;
+    struct AST *separator = parse_separator(stream, 0);
 
-    if (token == NEWLINE || __left == NULL) {
-        return (__left);
+    if (peek_token(*stream) != DELIMITER) {
+        return (separator);
     }
-    node = calloc(1, sizeof(struct ast));
-    if (node == NULL) {
-        return (__left);
+    delimiter = calloc(1, sizeof(*delimiter));
+    if (delimiter == NULL) {
+        return (separator);
     }
-    node->token = token;
-    node->__ast.digest = digest_token(*stream, charsets[2]);
-    node->__ast.left = __left;
+    delimiter->token = DELIMITER;
+    delimiter->delimiter = peek_type(*stream, charsets[DELIMITER]);
+    delimiter->left_operand = separator;
     pop_token(stream);
-    node->__ast.right = parse_delimiter(stream);
-    return (node);
+    delimiter->right_operand = parse_delimiter(stream);
+    return (delimiter);
 }

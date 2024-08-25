@@ -2,16 +2,15 @@
 ** EPITECH PROJECT, 2024
 ** sources/ftsh/read_stdin.c
 ** File description:
-** Read standard input
+** Read data from standard input
 ** Author: @lszsrd
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "ftsh/ftsh.h"
+#include "ftsh.h"
 
-// TODO: Use termios to handle proper line edition
 char *
 read_stdin(struct ftsh *shell)
 {

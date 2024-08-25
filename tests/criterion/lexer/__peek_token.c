@@ -7,7 +7,7 @@
 */
 
 #include "../criterion.h"
-#include "ftsh/lexer.h"
+#include "lexer.h"
 
 Test(peek_token, token_is_a_character)
 {

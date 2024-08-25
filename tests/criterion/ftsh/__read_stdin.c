@@ -10,7 +10,7 @@
 #include <errno.h>
 
 #include "../criterion.h"
-#include "ftsh/ftsh.h"
+#include "ftsh.h"
 
 Test(read_stdin, standard_input_is_closed)
 {
