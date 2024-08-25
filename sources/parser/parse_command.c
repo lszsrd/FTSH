@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libraries/strtoarray.h"
 #include "parser.h"
 
 static unsigned short
@@ -36,15 +37,14 @@ parse_redirection(char **stream, struct list **head, int redirection)
     }
     pop_token(stream);
     filename_length = parse_characters(stream);
-    if (filename_length == 0) {
-        return;
-    }
     node = calloc(1, sizeof(*node));
     if (node == NULL) {
         return;
     }
-    node->filename_path = strndup(*stream - filename_length, filename_length);
-    node->redirection = redirection;
+    if (filename_length != 0) {
+        node->filename = strndup(*stream - filename_length, filename_length);
+    }
+    node->IO = redirection;
     push_list(head, node);
     parse_redirection(stream, head, peek_type(*stream, charsets[REDIRECTION]));
 }
@@ -54,6 +54,7 @@ parse_command(char **stream)
 {
     unsigned short length = parse_characters(stream);
     struct AST *command;
+    char *buffer;
 
     if (length == 0) {
         return (NULL);
@@ -62,10 +63,11 @@ parse_command(char **stream)
     if (command == NULL) {
         return (NULL);
     }
-    command->binary_path = strndup(*stream - length, length);
     command->token = COMMAND;
-    parse_redirection(stream, &command->redirections, peek_type(
-        *stream, charsets[REDIRECTION])
-    );
+    buffer = strndup(*stream - length, length);
+    command->argv[1] = strtoarray(buffer, " \t");
+    free(buffer);
+    parse_redirection(stream, &command->IO, peek_type(
+        *stream, charsets[REDIRECTION]));
     return (command);
 }

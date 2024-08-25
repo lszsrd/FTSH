@@ -8,16 +8,17 @@
 
 #include <stdlib.h>
 
+#include "lexer.h"
 #include "parser.h"
 
 extern const char **charsets[];
 
-// TODO: Handle proper parenthesis handler
+// TODO: Handle parenthesis parsing
 struct AST *
 parse_delimiter(char **stream)
 {
+    struct AST *separator = parse_separator(stream);
     struct AST *delimiter;
-    struct AST *separator = parse_separator(stream, 0);
 
     if (peek_token(*stream) != DELIMITER) {
         return (separator);
@@ -27,9 +28,9 @@ parse_delimiter(char **stream)
         return (separator);
     }
     delimiter->token = DELIMITER;
-    delimiter->delimiter = peek_type(*stream, charsets[DELIMITER]);
-    delimiter->left_operand = separator;
+    delimiter->type = peek_type(*stream, charsets[DELIMITER]);
+    delimiter->left = separator;
     pop_token(stream);
-    delimiter->right_operand = parse_delimiter(stream);
+    delimiter->right = parse_delimiter(stream);
     return (delimiter);
 }

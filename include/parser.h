@@ -12,28 +12,21 @@
 #include "libraries/list.h"
 
 struct IO {
-    enum redirection redirection : 16;
-    char *filename_path;
+    enum redirection IO;
+    char *filename;
 };
 
 struct AST {
     enum token token;
     union {
         struct {
-            enum delimiter delimiter : 16;
-            struct AST *left_operand;
-            struct AST *right_operand;
+            short type;
+            struct AST *left;
+            struct AST *right;
         };
         struct {
-            enum separator separator : 16;
-            unsigned char first_separator;
-            struct list *commands_list;
-            struct AST *next_separator;
-        };
-        struct {
-            char *binary_path;
-            char **command_arguments;
-            struct list *redirections;
+            struct list *IO;
+            char **argv[2];
         };
     };
 };
@@ -41,7 +34,5 @@ struct AST {
 struct AST *parse_stream(char *);
 
 __attribute__((nonnull(1))) struct AST *parse_delimiter(char **);
-__attribute__((nonnull(1))) struct AST *parse_separator(char **, char);
+__attribute__((nonnull(1))) struct AST *parse_separator(char **);
 __attribute__((nonnull(1))) struct AST *parse_command(char **);
-
-void clear_ast(struct AST *);

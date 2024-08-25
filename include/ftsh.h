@@ -8,7 +8,7 @@
 
 #pragma once
 
-struct AST;
+#include "parser.h"
 
 struct ftsh {
     struct AST *ast;
@@ -16,5 +16,8 @@ struct ftsh {
 };
 
 __attribute__((nonnull(1))) void display_prompt(struct ftsh *);
-char *read_stdin(struct ftsh *);
-struct AST *parse_stream(char *);
+__attribute__((nonnull(1))) char *read_stdin(struct ftsh *);
+__attribute__((nonnull(1))) struct AST *parse_stream(char *);
+__attribute__((nonnull(1))) void clear_ast(struct AST *);
+
+void display_ast(struct AST *);

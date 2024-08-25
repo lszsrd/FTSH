@@ -6,10 +6,12 @@
 ** Author: @lszsrd
 */
 
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "ftsh.h"
-#include "parser.h"
+
+struct ftsh shell = {0};
 
 __attribute__((constructor)) static void
 constructor(void)
@@ -17,11 +19,10 @@ constructor(void)
     return;
 }
 
+// TODO: Add AST expansion (grammar check and aliases replacement)
 __attribute__((noreturn))
 int main(__attribute__((unused)) int argc, const char **argv)
 {
-    struct ftsh shell = {0};
-
     while (1) {
         if (isatty(STDIN_FILENO) == 1) {
             display_prompt(&shell);

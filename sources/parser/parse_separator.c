@@ -8,20 +8,11 @@
 
 #include <stdlib.h>
 
+#include "lexer.h"
 #include "parser.h"
 
-static void
-parse_sub_commands(char **stream, struct AST *separator, struct AST *command)
-{
-    push_list(&separator->commands_list, command);
-    if (peek_type(*stream, charsets[SEPARATOR]) == separator->separator) {
-        pop_token(stream);
-        parse_sub_commands(stream, separator, parse_command(stream));
-    }
-}
-
 struct AST *
-parse_separator(char **stream, char first_separator)
+parse_separator(char **stream)
 {
     struct AST *command = parse_command(stream);
     struct AST *separator;
@@ -34,11 +25,9 @@ parse_separator(char **stream, char first_separator)
         return (command);
     }
     separator->token = SEPARATOR;
-    separator->separator = peek_type(*stream, charsets[SEPARATOR]);
-    separator->first_separator = first_separator;
-    parse_sub_commands(stream, separator, command);
-    if (peek_token(*stream) == SEPARATOR) {
-        separator->next_separator = parse_separator(stream, 1);
-    }
+    separator->type = peek_type(*stream, charsets[SEPARATOR]);
+    separator->left = command;
+    pop_token(stream);
+    separator->right = parse_separator(stream);
     return (separator);
 }

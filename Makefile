@@ -12,13 +12,19 @@ CFLAGS					+=	-Wall -Wextra -Wpedantic -Wundef -Wpointer-arith \
 					 		-Waggregate-return -Wwrite-strings -Winit-self 	 \
 							-Wlogical-not-parentheses -Waddress	-Wshadow	 \
 							-fpic -iquote include -g
-LDFLAGS					+=	-Wl,-rpath libraries -L libraries -l list
+LDFLAGS					+=	-Wl,-rpath libraries -L libraries 				 \
+							-l list -l strtoarray
 CPPGLAGS				+=
 
 # `ftsh` binary part
 BINARY_FTSH				:=	ftsh
 BINARY_FTSH_SOURCES		:=	$(shell find sources -name '*.c')
 BINARY_FTSH_OBJECTS		:=	$(BINARY_FTSH_SOURCES:.c=.o)
+
+# `strtoarray` library part
+LIB_STRTOARRAY			:=	libstrtoarray.so
+LIB_STRTOARRAY_SOURCES	:=	$(shell find libraries/strtoarray -name '*.c')
+LIB_STRTOARRAY_OBJECTS	:=	$(LIB_STRTOARRAY_SOURCES:.c=.o)
 
 # `list` library part
 LIB_LIST				:=	liblist.so
@@ -33,7 +39,12 @@ TESTS_SOURCES			:=	$(filter-out sources/ftsh/main.c,				 \
 TESTS_FLAGS				:=  --coverage -L /opt/homebrew/lib -l criterion
 
 # Builds libraries and binaries
-all: libraries/$(LIB_LIST) $(BINARY_FTSH)
+all: libraries/$(LIB_STRTOARRAY) libraries/$(LIB_LIST) $(BINARY_FTSH)
+
+# Builds `strtoarray` shared library
+libraries/$(LIB_STRTOARRAY): $(LIB_STRTOARRAY_OBJECTS)
+	$(CC) -shared -o libraries/$(LIB_STRTOARRAY) $(LIB_STRTOARRAY_OBJECTS)
+	@printf "\e[1;42mSuccessfully built libraries/%s\e[0m\n" $(LIB_STRTOARRAY)
 
 # Builds `list` shared library
 libraries/$(LIB_LIST): $(LIB_LIST_OBJECTS)
@@ -63,6 +74,7 @@ clean:
 
 # Delete builds' files, binaries and libraries
 fclean: clean
+	$(RM) libraries/$(LIB_STRTOARRAY) $(LIB_STRTOARRAY_OBJECTS)
 	$(RM) libraries/$(LIB_LIST) $(LIB_LIST_OBJECTS)
 	$(RM) $(BINARY_FTSH) $(BINARY_FTSH_OBJECTS)
 	$(RM) unit_tests
