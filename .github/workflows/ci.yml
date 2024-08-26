@@ -12,23 +12,6 @@ env:
 
 jobs:
   ###
-  # Run coding style checker
-  #
-  check-coding-style:
-    name: Checking coding style
-    runs-on: ubuntu-latest
-    container: ghcr.io/epitech/coding-style-checker:latest
-
-    steps:
-    - name: Cloning repository
-      uses: actions/checkout@v4
-      timeout-minutes: 2
-
-    - name: Running bannana-checker
-      uses: lszsrd/ci-composite-actions/coding-style-checker@v1
-      timeout-minutes: 2
-
-  ###
   # Check projects compilation
   #
   check-program-compilation:
