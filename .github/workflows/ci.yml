@@ -18,7 +18,6 @@ jobs:
     name: Checking compilation
     runs-on: ubuntu-latest
     container: ghcr.io/epitech/coding-style-checker:latest
-    needs: check-coding-style
 
     steps:
     - name: Cloning repository

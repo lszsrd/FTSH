@@ -1,7 +1,10 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#define UNKNOWN                 0xFFFFFFF
+#define LOCKED                  0
+#define UNLOCKED                1
+
+#define UNKNOWN                 (unsigned) 0xFFFFFFF
 
 #define MAX_HEAP_ALPHABET       32
 #define MAX_HEAP_LEXEM          1024
@@ -14,6 +17,7 @@ enum token {
     REDIRECTION                 = 4,
     OPERATOR                    = 5,
     JOB_CONTROL                 = 6,
+    COMPOUND                    = 7,
 };
 
 enum symbol {
@@ -26,9 +30,10 @@ enum symbol {
     DASH                        = 32,
     SLASH                       = 64,
     PONCTUATION                 = 128,
-    BINARY                      = 256,
-    JOB                         = 512,
-    IO                          = 1024,
+    NEWLINE                     = 256,
+    BINARY                      = 512,
+    JOB                         = 1024,
+    IO                          = 2048,
 };
 
 struct dict {
@@ -46,6 +51,7 @@ const struct dict dictionary[] = {
     { DASH                      , { "-" } },
     { SLASH                     , { "/" } },
     { PONCTUATION               , { "#", "$", ",", ".", ":", ";", "?", "@", "_" } },
+    { NEWLINE                   , { "\n" } },
     { BINARY                    , { "&&", "||", "|" } },
     { JOB                       , { "&" } },
     { IO                        , { ">>", ">", "<<", "<" } },
@@ -76,11 +82,22 @@ const struct grammar grammar[] = {
     { OPERATOR                  , (BINARY & (WORD | REDIRECTION))
                                 | ((WORD | REDIRECTION) & BINARY & (WORD | REDIRECTION)) },
     { JOB_CONTROL               , (WORD | REDIRECTION) & JOB },
+    { COMPOUND                  , WORD
+                                | (WORD & NEWLINE)
+                                | REDIRECTION
+                                | (REDIRECTION & NEWLINE)
+                                | OPERATOR
+                                | (OPERATOR & NEWLINE)
+                                | COMPOUND },
+    { UNKNOWN                   , 0 },
 };
 
 struct lexeme {
     enum token token;
+    unsigned char ready:1;
     char attribute[MAX_HEAP_LEXEM];
 };
+
+static struct lexeme lexeme = { UNKNOWN, UNLOCKED, {0} };
 
 #endif /* ! LEXER_H */
