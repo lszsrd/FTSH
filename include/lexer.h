@@ -1,103 +1,67 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#define LOCKED                  0
-#define UNLOCKED                1
+// ls -a > logfile.txt && cd - ;
+// [STRING] [REDIRECTION] [STRING] [OPERATOR] [STRING] [SEMICOLON] [NEWLINE]
+//
+// ls &
+// [STRING] [JOBCONTROL] [NEWLINE]
+//
+// ls && ((cd -) || echo OK) ;
+// [STRING] [OPERATOR] [OPEN] [OPEN] [STRING] [CLOSE] [OPERATOR] [STRING] [CLOSE] [SEMICOLON] [NEWLINE]
+//
+// 1. Tokenize string - DONE
+// 2. Store produced tokens into a list (pushing tokens)
+// 3. Parse tokens with a grammar
+// And voila
 
-#define UNKNOWN                 (unsigned) 0xFFFFFFF
-
-#define MAX_HEAP_ALPHABET       32
-#define MAX_HEAP_LEXEM          1024
-
-enum token {
-    CHARACTER                   = 0,
-    WORD                        = 1,
-    NUMBER                      = 2,
-    ARITHMETIC_OPERATOR         = 3,
-    REDIRECTION                 = 4,
-    OPERATOR                    = 5,
-    JOB_CONTROL                 = 6,
-    COMPOUND                    = 7,
-};
-
-enum symbol {
-    INTEGER                     = 0,
-    UPPER_CASE                  = 1,
-    LOWER_CASE                  = 2,
-    BLANK                       = 4,
-    ARITHMETIC                  = 8,
-    PLUS                        = 16,
-    DASH                        = 32,
-    SLASH                       = 64,
-    PONCTUATION                 = 128,
-    NEWLINE                     = 256,
-    BINARY                      = 512,
-    JOB                         = 1024,
-    IO                          = 2048,
-};
+#define BIT(x) 1 << x
 
 struct dict {
-    enum symbol symbol;
-    const char *alphabet[MAX_HEAP_ALPHABET];
+    int key;
+    const char **data;
 };
 
-const struct dict dictionary[] = {
-    { INTEGER                   , { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" } },
-    { UPPER_CASE                , { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" } },
-    { LOWER_CASE                , { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" } },
-    { BLANK                     , { " ", "\t" } },
-    { ARITHMETIC                , { "%", "*" } },
-    { PLUS                      , { "+" }},
-    { DASH                      , { "-" } },
-    { SLASH                     , { "/" } },
-    { PONCTUATION               , { "#", "$", ",", ".", ":", ";", "?", "@", "_" } },
-    { NEWLINE                   , { "\n" } },
-    { BINARY                    , { "&&", "||", "|" } },
-    { JOB                       , { "&" } },
-    { IO                        , { ">>", ">", "<<", "<" } },
-    { UNKNOWN                   , { 0 } }
+const char **lookup_table[] = {
+    (const char *[]) { "\n", (void *) 0 },
+    (const char *[]) { ";", (void *) 0 },
+    (const char *[]) { "(", ")", (void *) 0 },
+    (const char *[]) { ">>", ">", "<<", "<", (void *) 0 },
+    (const char *[]) { "&&", "||", "|", (void *) 0 },
+    (const char *[]) { "\"", "'", (void *) 0 },
+    (const char *[]) { "&", (void *) 0 },
+    (void *) 0,
 };
 
-struct grammar {
-    enum token token;
-    __typeof__(UNKNOWN) grammar;
+enum lexeme {
+    NEWLINE = BIT(0),
+    SEMICOLON = BIT(1),
+    PARENTHESIS = BIT(2),
+    REDIRECTION = BIT(3),
+    PIPELINE = BIT(4),
+    QUOTE = BIT(5),
+    BACKGROUND = BIT(6),
+    STRING = BIT(7),
+    UNKNOWN = 0xFFFF,
 };
 
-const struct grammar grammar[] = {
-    { CHARACTER                 , INTEGER
-                                | UPPER_CASE
-                                | LOWER_CASE
-                                | BLANK
-                                | DASH
-                                | SLASH },
-    { WORD                      , CHARACTER
-                                | WORD },
-    { NUMBER                    , INTEGER
-                                | (NUMBER & INTEGER)
-                                | (DASH & INTEGER) },
-    { ARITHMETIC_OPERATOR       , ARITHMETIC
-                                | DASH
-                                | SLASH },
-    { REDIRECTION               , WORD & IO & WORD },
-    { OPERATOR                  , (BINARY & (WORD | REDIRECTION))
-                                | ((WORD | REDIRECTION) & BINARY & (WORD | REDIRECTION)) },
-    { JOB_CONTROL               , (WORD | REDIRECTION) & JOB },
-    { COMPOUND                  , WORD
-                                | (WORD & NEWLINE)
-                                | REDIRECTION
-                                | (REDIRECTION & NEWLINE)
-                                | OPERATOR
-                                | (OPERATOR & NEWLINE)
-                                | COMPOUND },
-    { UNKNOWN                   , 0 },
+// 8 4 2 1
+//
+
+struct dict table[] = {
+    { NEWLINE, (const char *[]) { "\n", (void *) 0 } },
+    { SEMICOLON, (const char *[]) { ";", (void *) 0 } },
+    { PARENTHESIS, (const char *[]) { "(", ")", (void *) 0 } },
+    { REDIRECTION, (const char *[]) { ">>", ">", "<<", "<", (void *) 0 } },
+    { PIPELINE, (const char *[]) { "&&", "||", "|", (void *) 0 } },
+    { QUOTE, (const char *[]) { "\"", "'", (void *) 0 } },
+    { BACKGROUND, (const char *[]) { "&", (void *) 0 } },
+    { UNKNOWN, (void *) 0 },
 };
 
-struct lexeme {
-    enum token token;
-    unsigned char ready:1;
-    char attribute[MAX_HEAP_LEXEM];
+struct token {
+    enum lexeme lexeme;
+    void *data;
 };
-
-static struct lexeme lexeme = { UNKNOWN, UNLOCKED, {0} };
 
 #endif /* ! LEXER_H */

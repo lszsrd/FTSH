@@ -1,71 +1,95 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "lexer.h"
 
-static __typeof__(UNKNOWN) peek_attribute(const char *stream, enum symbol key)
+static unsigned short lookup_table_scanner(char *stream, enum lexeme key)
 {
-    for (unsigned char value = 0; dictionary[key].alphabet[value] != NULL; value++) {
-        if (strncmp(dictionary[key].alphabet[value], stream, strlen(dictionary[key].alphabet[value])) == 0) {
+    for (unsigned char value = 0; table[key].data[value] != NULL; value++) {
+        if ( strncmp(lookup_table[key][value], stream, strlen(lookup_table[key][value])) == 0 ) {
             return value;
         }
     }
     return UNKNOWN;
 }
 
-static __typeof__(UNKNOWN) peek_symbol(const char *stream)
+static enum lexeme lexeme_scanner(char *stream)
 {
-    for (unsigned char key = 0; dictionary[key].symbol != UNKNOWN; key++) {
-        if (peek_attribute(stream, key) != UNKNOWN) {
-            return key;
+    if ( *stream == '\0' ) {
+        return UNKNOWN;
+    }
+
+    for (enum lexeme key = 0; table[key].key != UNKNOWN; key++) {
+        if ( lookup_table_scanner(stream, key) != UNKNOWN ) {
+            return table[key].key;
         }
     }
-    return UNKNOWN;
+    return STRING;
 }
 
-void pop_token(char **stream)
+static char *string_scanner(char **stream)
 {
-    *stream += strlen(lexeme.attribute);
+    size_t litteral_length;
+
+    for (litteral_length = 0; lexeme_scanner(*stream) == STRING; (*stream)++) {
+        litteral_length++;
+    }
+    return strndup(*stream - litteral_length, litteral_length);
 }
 
-void peek_token(const char *stream)
+static struct token *scanner(char **stream)
 {
-    enum symbol keys[2] = { peek_symbol(stream), UNKNOWN };
-    enum token token = UNKNOWN;
+    static enum lexeme lexeme;
+    struct token *token;
 
-    if (lexeme.ready == LOCKED) {
-        return;
+    for (; **stream == ' ' || **stream == '\t'; (*stream)++);
+
+    if ( (lexeme = lexeme_scanner(*stream)) == UNKNOWN || (token = calloc(1, sizeof(*token))) == NULL ) {
+        return NULL;
     }
 
-    if (*keys != UNKNOWN) {
-        __typeof__(UNKNOWN) value = peek_attribute(stream, *keys);
-        keys[1] = peek_symbol(stream + strlen(dictionary[*keys].alphabet[value]));
+    if ( (token->lexeme = lexeme) == STRING ) {
+        token->data = string_scanner(stream);
+    } else {
+        token->data = (void *) (long) lookup_table_scanner(*stream, lexeme);
+        *stream += strlen(table[lexeme].data[(size_t) token->data]);
+    }
+    return token;
+}
 
-        // TODO: Not looking at the correct token, preventing grammar to stop
-        for (token = 0; grammar[token].token != UNKNOWN; token++) {
-            if ((grammar[token].grammar | (keys[0] & keys[1])) == grammar[token].grammar) {
-                break;
-            }
-        }
+struct token **lexer(char **stream)
+{
+    struct token **tokens = calloc(32, sizeof(tokens));
 
-        strcat(lexeme.attribute, dictionary[*keys].alphabet[value]);
-        peek_token(stream + 1);
+    if ( tokens == NULL ) {
+        return NULL;
     }
 
-    lexeme.ready = LOCKED;
-    lexeme.token = token;
+    for (size_t index = 0; ( tokens[index] = scanner(stream) ) != NULL; index++);
+    return tokens;
 }
 
-void clear_token(void)
-{
-    lexeme.ready = UNLOCKED;
-    lexeme.token = UNKNOWN;
-    memset(lexeme.attribute, 0, MAX_HEAP_LEXEM);
-}
-\
 int main(void)
 {
-    peek_token("ls > a ; bè");
-    printf("%d - %s\n", lexeme.token, lexeme.attribute);
+    //__builtin_ctz(2);
+    /*
+    struct token ** t;
+    char *b = NULL;
+    size_t l = 0;
+
+    while (getline(&b, &l, stdin) != EOF) {
+        t = lexer(&b);
+        for (int i = 0; t && t[i]; i++) {
+            printf("[%d] ", t[i]->lexeme);
+            if (t[i]->lexeme == STRING) free(t[i]->data);
+            free(t[i]);
+        }
+        free(t);
+        printf("\n");
+    }
+    free(b);
+    */
+    printf("%d\n", lexeme_scanner("&&"));
     return 0;
 }
