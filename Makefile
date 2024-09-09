@@ -1,5 +1,5 @@
 ##
-## EPITECH PROJECT, 2024
+## FTSH PROJECT, 2024
 ## Makefile
 ## File description:
 ## Define Makefile's rules used to build libraries, binaries and unit tests
@@ -19,13 +19,6 @@ CPPGLAGS				+=
 BINARY_FTSH				:=	ftsh
 BINARY_FTSH_SOURCES		:=	$(shell find sources -name '*.c')
 BINARY_FTSH_OBJECTS		:=	$(BINARY_FTSH_SOURCES:.c=.o)
-
-# `unit_tests` tests part
-TESTS_BINARY			:=	unit_tests
-TESTS_SOURCES			:=	$(filter-out sources/ftsh/main.c,				 \
-							$(shell find sources -name '*.c')				 \
-							$(shell find tests/criterion -name '*.c'))
-TESTS_FLAGS				:=  --coverage -L /opt/homebrew/lib -l criterion
 
 # Builds libraries and binaries
 all: $(BINARY_FTSH)
